@@ -1,0 +1,52 @@
+verbose: True  # True, False
+experiment_name: test
+dataset: PHMAP23Spacecraftpropulsion  # CWRU, PHM22Rockdrill, PHMAP23Spacecraftpropulsion
+seed: 1  # Random seed
+embedding_dim: 64  # Embedding dimension
+eval_interval: 1  # Model gets evaluated every eval_interval epochs
+
+loss:  # Set loss
+  clf:
+    epochs: 200  # Epochs classification
+  embedding:  # Comment out if no embedding is wanted
+    epochs: 200  # Epochs embedding
+    name: kg_self_dist # kg_self_dist, supcon
+
+model:
+  type: GNN  # GNN, CNN
+  CNN:
+    split_type: phase  # phase, one
+  GNN:
+    graph:
+      split_type: one  # phase, one
+      edge_attr: True  # True, False
+    cnn_pre: True  # True, False
+
+data:
+  train_size: 0.8
+  batch_size: 16
+  force_reload: True  # True, False
+  CWRU:
+    path_to_data: path/to/CWRU_data
+    train_settings: ['1']  # ['0', '1', '2', '3']
+    kg_path: kgs/cwru_fault_hierarchy.ttl
+    load:
+      sample_rate: 12
+      segment_length: 512
+      ood_faults: ['007B', '014B', '021B']  # ['021B', '007OR', '007IR', '014IR', 'Normal', '014OR', '021IR', '014B', '021OR', '007B']
+  PHM22Rockdrill:
+    path_to_data: path/to/rockdrill_data
+    train_settings: [0]  # [0, 1, 2, 3, 4, 5, 6, 7]
+    kg_path: kgs/phm22_rockdrill_fault_hierarchy.ttl
+    load:
+      max_train_length: 900
+      ood_faults: ['T']  # ['T', 'A', 'B', 'R', 'S', 'D', 'Q', 'V', 'O', 'C'])
+  PHMAP23Spacecraftpropulsion:
+    path_to_data: path/to/spacecraft_data
+    train_settings: [1]  # [1, 2, 3, 4]
+    kg_path: kgs/phmap23_spacecraftpropulsion_fault_hierarchy.ttl
+    load:
+      split: True  # True, False
+      label_solenoid_sev: False  # True, False
+      include_unknown: False  # True, False
+      ood_faults: ['BV1', 'BP1']  # [] ['BV1', 'BP1'] ['BP1', 'BP2', 'BP3', 'BP4', 'BP5', 'BP6', 'BP7', 'BV1', 'Normal', 'SV1', 'SV2', 'SV3', 'SV4']

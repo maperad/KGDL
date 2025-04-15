@@ -1,0 +1,29 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix con: <http://condition.org/> .
+
+con:Normal con:p_0 con:o_0 .
+
+con:IR rdfs:subClassOf con:Fault .
+con:OR rdfs:subClassOf con:Fault .
+con:B rdfs:subClassOf con:Fault .
+
+con:021B rdfs:subClassOf con:B ;
+    rdfs:subClassOf con:021 .
+con:014B rdfs:subClassOf con:B ;
+    rdfs:subClassOf con:014 .
+con:007B rdfs:subClassOf con:B ;
+    rdfs:subClassOf con:007 .
+
+con:021IR rdfs:subClassOf con:IR ;
+    rdfs:subClassOf con:021 .
+con:014IR rdfs:subClassOf con:IR ;
+    rdfs:subClassOf con:014 .
+con:007IR rdfs:subClassOf con:IR ;
+    rdfs:subClassOf con:007 .
+
+con:021OR rdfs:subClassOf con:OR ;
+    rdfs:subClassOf con:021 .
+con:014OR rdfs:subClassOf con:OR ;
+    rdfs:subClassOf con:014 .
+con:007OR rdfs:subClassOf con:OR ;
+    rdfs:subClassOf con:007 .

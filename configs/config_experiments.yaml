@@ -1,0 +1,51 @@
+verbose: False
+cuda_device: Set in experiment script
+experiment_name: Set in the experiment script
+dataset: Set in the experiment script
+seed: Set in the experiment script
+embedding_dim: 64
+loss: Set in the experiment script
+eval_interval: 100
+
+model:
+  type: Set in the experiment script
+  CNN:
+    split_type: Set in the experiment script
+  GNN:
+    graph:
+      split_type: Set in the experiment script
+      edge_attr: True
+    cnn_pre: Set in the experiment script
+
+loss: Set in the experiment script
+
+data:
+  train_size: Set in the experiment script
+  batch_size: Set in experiment script
+  force_reload: False
+  CWRU:
+    path_to_data: path/to/CWRU_data
+    train_settings: Set in the experiment script
+    kg_path: Set in the experiment script
+    load:
+      sample_rate: 12
+      segment_length: 512
+      ood_faults: Set in the experiment script
+  PHM22Rockdrill:
+    path_to_data: path/to/rockdrill_data
+    setting: setting  # setting, null
+    train_settings: Set in the experiment script
+    kg_path: Set in the experiment script
+    load:
+      max_train_length: 900
+      ood_faults: Set in the experiment script
+  PHMAP23Spacecraftpropulsion:
+    path_to_data: path/to/spacecraft_data
+    setting: setting
+    train_settings: Set in the experiment script
+    kg_path: Set in the experiment script
+    load:
+      split: True  # True, False
+      label_solenoid_sev: False  # True, False
+      include_unknown: False  # True, False
+      ood_faults: Set in the experiment script

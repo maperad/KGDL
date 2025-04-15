@@ -1,0 +1,25 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix con: <http://condition.org/> .
+
+con:Normal con:p_0 con:o_0 .
+
+con:ShankAdapter rdfs:subClassOf con:Fault .
+con:Accumulator rdfs:subClassOf con:Fault .
+con:PressureControlReturnChannel rdfs:subClassOf con:Fault .
+con:Damper rdfs:subClassOf con:Fault .
+con:Valve rdfs:subClassOf con:Fault .
+
+con:S rdfs:subClassOf con:ShankAdapter .
+con:T rdfs:subClassOf con:ShankAdapter .
+
+con:R rdfs:subClassOf con:Accumulator .
+con:C rdfs:subClassOf con:Accumulator .
+
+con:A rdfs:subClassOf con:PressureControlReturnChannel .
+con:B rdfs:subClassOf con:PressureControlReturnChannel .
+con:O rdfs:subClassOf con:PressureControlReturnChannel .
+
+con:D rdfs:subClassOf con:Damper .
+con:Q rdfs:subClassOf con:Damper .
+
+con:V rdfs:subClassOf con:Valve .

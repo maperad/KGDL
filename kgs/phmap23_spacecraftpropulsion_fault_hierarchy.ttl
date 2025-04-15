@@ -1,0 +1,38 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix con: <http://condition.org/> .
+
+con:Normal con:p_0 con:o_0 .
+
+con:Bubble rdfs:subClassOf con:Fault .
+con:Solenoid rdfs:subClassOf con:Fault .
+
+con:BV1 rdfs:subClassOf con:Bubble ;
+    rdfs:subClassOf con:P1 .    
+con:BP1 rdfs:subClassOf con:Bubble ;
+    rdfs:subClassOf con:P1 .
+
+con:BP2 rdfs:subClassOf con:Bubble ;
+    rdfs:subClassOf con:P2 .
+
+con:BP3 rdfs:subClassOf con:Bubble ;
+    rdfs:subClassOf con:P3 .
+con:SV1 rdfs:subClassOf con:Solenoid ;
+    rdfs:subClassOf con:P3 .
+
+con:BP4 rdfs:subClassOf con:Bubble ;
+    rdfs:subClassOf con:P4 .
+con:SV2 rdfs:subClassOf con:Solenoid ;
+    rdfs:subClassOf con:P4 .
+
+con:BP5 rdfs:subClassOf con:Bubble ;
+    rdfs:subClassOf con:P5 .
+
+con:BP6 rdfs:subClassOf con:Bubble ;
+    rdfs:subClassOf con:P6 .
+con:SV3 rdfs:subClassOf con:Solenoid ;
+    rdfs:subClassOf con:P6 .
+
+con:BP7 rdfs:subClassOf con:Bubble ;
+    rdfs:subClassOf con:P7 .
+con:SV4 rdfs:subClassOf con:Solenoid ;
+    rdfs:subClassOf con:P7 .
