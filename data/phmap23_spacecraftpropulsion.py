@@ -471,11 +471,12 @@ class PHMAP23Spacecraftpropulsion(DataPrep):
 
     def transform_to_graph_data(
             self, edge_attr: bool = True, graph_type: str = 'hetero',
-            split_type: str = 'phase'
+            split_type: str = 'phase', bandwidth: float = 2.0
     ) -> None:
         graph_path = Path(
-            f"data/graphs/phmap23_spacecraftpropulstion/{graph_type}"
+            f"data/graphs/phmap23_spacecraftpropulsion/{graph_type}"
             f"_edge_{edge_attr}"
+            f"_bandwith_{bandwidth}"
             f"_split_{split_type}"
             f"_split_{self.split}.pt"
         )
@@ -491,7 +492,7 @@ class PHMAP23Spacecraftpropulsion(DataPrep):
 
             # Create phase graph for each sample
             self.graph_list = self._create_phase_graph(
-                X_phases, self.y, edge_attr, graph_type,
+                X_phases, self.y, edge_attr, bandwidth, graph_type,
                 additional_info={
                     'setting': self.setting,
                     'y_kg_emb': self.y_kg_emb

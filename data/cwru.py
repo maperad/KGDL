@@ -217,12 +217,13 @@ class CWRU(DataPrep):
 
     def transform_to_graph_data(
             self, edge_attr: bool = True, graph_type: str = 'hetero',
-            split_type: str = 'phase'
+            split_type: str = 'phase', bandwidth: float = 2.0
     ) -> None:
         graph_path = Path(
             f"data/graphs/cwru/{self.sample_rate}"
             f"_{self.segment_length}"
             f"_split_{split_type}"
+            f"_bandwith_{bandwidth}"
             f"_{graph_type}_edge_{edge_attr}.pt"
         )
         if (not self.FORCE_RELOAD) and graph_path.exists():
@@ -242,7 +243,7 @@ class CWRU(DataPrep):
             )
 
             self.graph_list = self._create_phase_graph(
-                X_s_p, self.y, edge_attr, graph_type,
+                X_s_p, self.y, edge_attr, bandwidth, graph_type,
                 {'y_score': self.y_score,
                  'y_kg_emb': self.y_kg_emb,
                  'rpm': self.rpm,

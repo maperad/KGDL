@@ -5,7 +5,7 @@ from pytorch_metric_learning.utils import loss_and_miner_utils as lmu
 
 
 class EmbLoss():
-    def __init__(self, name='kg'):
+    def __init__(self, name='kg', temperature=0.1):
 
         # Set distance metric
         distance = distances.CosineSimilarity()
@@ -13,10 +13,16 @@ class EmbLoss():
         # Initialize loss function
         self.name = name
         if name == 'supcon':
-            self.loss = SupConLoss(distance=distance)
+            self.loss = SupConLoss(
+                distance=distance,
+                temperature=temperature
+            )
         elif name == 'kg':
             # Adds distance calcuation between kg and self
-            self.loss = SupConLossSelfDist(distance=distance)
+            self.loss = SupConLossSelfDist(
+                distance=distance,
+                temperature=temperature
+            )
         else:
             raise ValueError(f'Loss name {name} not recognized')
 

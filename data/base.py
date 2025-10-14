@@ -66,7 +66,7 @@ class DataPrep():
 
     def transform_to_graph_data(
             self, edge_attr: bool = True, graph_type: str = 'hetero',
-            split_type: str = 'phase'
+            split_type: str = 'phase', bandwidth: float = 2.0
     ) -> None:
         raise NotImplementedError
 
@@ -116,6 +116,7 @@ class DataPrep():
             X: dict,
             y: torch.Tensor,
             edge_attr: bool = True,
+            bandwidth: float = 2.0,
             graph_type: str = 'hetero',
             additional_info: dict = {}
             ) -> list:
@@ -158,7 +159,8 @@ class DataPrep():
                     p_edge_index = tmp_graph[p, f"e_{p}", p].edge_index
                     tmp_graph[p, f"e_{p}", p].edge_attr = \
                         self.gaussian_kernel_weight_dist(
-                            p_node[p_edge_index[0]], p_node[p_edge_index[1]], 2
+                            p_node[p_edge_index[0]], p_node[p_edge_index[1]],
+                            bandwidth
                         ).type(torch.float32).reshape(-1, 1)
 
             # p1 -> p2 -> p3 ... for each sensor

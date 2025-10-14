@@ -10,7 +10,8 @@ loss:  # Set loss
     epochs: 200  # Epochs classification
   embedding:  # Comment out if no embedding is wanted
     epochs: 200  # Epochs embedding
-    name: kg # kg, supcon
+    name: kg  # kg, supcon
+    temperature: 0.1  
 
 model:
   type: GNN  # GNN, CNN
@@ -20,6 +21,7 @@ model:
     graph:
       split_type: one  # phase, one
       edge_attr: True  # True, False
+      bandwidth: 2
     cnn_pre: True  # True, False
 
 data:
