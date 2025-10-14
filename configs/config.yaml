@@ -4,6 +4,7 @@ dataset: PHMAP23Spacecraftpropulsion  # CWRU, PHM22Rockdrill, PHMAP23Spacecraftp
 seed: 1  # Random seed
 embedding_dim: 64  # Embedding dimension
 eval_interval: 1  # Model gets evaluated every eval_interval epochs
+cuda_device: 1
 
 loss:  # Set loss
   clf:

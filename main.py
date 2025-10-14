@@ -41,6 +41,13 @@ def main(config: dict, save_model: bool = False) -> None:
 
     # Set device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    if torch.cuda.is_available():
+        if torch.cuda.device_count() > 1:
+            device = torch.device(f"cuda:{config['cuda_device']}")
+        else:
+            device = torch.device('cuda')
+    # device = torch.device('cpu')
+    logging.info(f"Device: {device}")
 
     # Load data
     data_set_name = config['dataset']
