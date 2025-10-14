@@ -136,7 +136,7 @@ def run_experiments(
         {'clf': {'epochs': epochs_clf},
          'embedding': {
              'epochs': epoch_emb[dataset],
-             'name': 'kg_self_dist'
+             'name': 'kg'
             }},
         # Supervised Contrastive Embedding
         {'clf': {'epochs': epochs_clf},

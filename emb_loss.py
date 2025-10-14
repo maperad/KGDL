@@ -14,14 +14,14 @@ class EmbLoss():
         self.name = name
         if name == 'supcon':
             self.loss = SupConLoss(distance=distance)
-        elif name == 'kg_self_dist':
+        elif name == 'kg':
             # Adds distance calcuation between kg and self
             self.loss = SupConLossSelfDist(distance=distance)
         else:
             raise ValueError(f'Loss name {name} not recognized')
 
     def __call__(self, projections, y_label, y_kg_emb):
-        if self.name == 'kg_self_dist':
+        if self.name == 'kg':
             return self.loss(
                 projections, y_label, ref_emb=y_kg_emb
             )

@@ -10,7 +10,7 @@ loss:  # Set loss
     epochs: 200  # Epochs classification
   embedding:  # Comment out if no embedding is wanted
     epochs: 200  # Epochs embedding
-    name: kg_self_dist # kg_self_dist, supcon
+    name: kg # kg, supcon
 
 model:
   type: GNN  # GNN, CNN
