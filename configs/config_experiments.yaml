@@ -15,6 +15,7 @@ model:
     graph:
       split_type: Set in the experiment script
       edge_attr: True
+      bandwidth: Set in experiment script
     cnn_pre: Set in the experiment script
 
 loss: Set in the experiment script

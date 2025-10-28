@@ -4,7 +4,7 @@ dataset: PHMAP23Spacecraftpropulsion  # CWRU, PHM22Rockdrill, PHMAP23Spacecraftp
 seed: 1  # Random seed
 embedding_dim: 64  # Embedding dimension
 eval_interval: 1  # Model gets evaluated every eval_interval epochs
-cuda_device: 1
+cuda_device: 1  # Select cuda device
 
 loss:  # Set loss
   clf:
@@ -12,7 +12,7 @@ loss:  # Set loss
   embedding:  # Comment out if no embedding is wanted
     epochs: 200  # Epochs embedding
     name: kg  # kg, supcon
-    temperature: 0.1  
+    temperature: 0.1  # Temperature in contrastive loss
 
 model:
   type: GNN  # GNN, CNN
@@ -22,7 +22,7 @@ model:
     graph:
       split_type: one  # phase, one
       edge_attr: True  # True, False
-      bandwidth: 2
+      bandwidth: 2  # Gaussian kernel bandwidth for edge attributes
     cnn_pre: True  # True, False
 
 data:
