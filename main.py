@@ -12,6 +12,7 @@ from emb_loss import EmbLoss
 from evaluation import evaluate_model_performance
 from models.cnn import CnnBase
 from models.gnn import GnnBase
+from models.cnn_da import CnnDA
 from utils import ensure_reproduciblity, yaml_dump
 
 
@@ -28,6 +29,9 @@ def main(config: dict, save_model: bool = False) -> None:
     save_model : bool, optional
         Whether to save the trained model.
     '''
+
+    # TODO final code
+    # anonymize dataset paths
 
     if config['verbose']:
         logging.basicConfig(
@@ -90,7 +94,7 @@ def main(config: dict, save_model: bool = False) -> None:
     # Create dataloaders and init models
     model_type = config['model']['type']
     model_config = config['model'][model_type]
-    if model_type == 'CNN':
+    if (model_type == 'CNN') or (model_type == 'CNN_DA'):
         # Create euclidean dataloaders and init CNN
         dataloader_train, dataloader_test = data.create_euclidean_dataloaders(
             test_size=1-config['data']['train_size'],
@@ -99,16 +103,23 @@ def main(config: dict, save_model: bool = False) -> None:
             ood_fault_list=data_config['load']['ood_faults']
         )
         exemp_input = next(iter(dataloader_train))['X'].to(device)
-        model = CnnBase(
-            n_classes=data.n_train_classes,
-            input_dim=data.X.shape[2],
-            input_channels=data.X.shape[1],
-            embedding_dim=config['embedding_dim'],
-            projection_dim=projection_dim,
-            parts=parts,
-            dataset=config['dataset'],
-            split_type=model_config['split_type']
-        ).to(device)
+        if model_type == 'CNN':
+            model = CnnBase(
+                n_classes=data.n_train_classes,
+                input_dim=data.X.shape[2],
+                input_channels=data.X.shape[1],
+                embedding_dim=config['embedding_dim'],
+                projection_dim=projection_dim,
+                parts=parts,
+                dataset=config['dataset'],
+                split_type=model_config['split_type']
+            ).to(device)
+        elif model_type == 'CNN_DA':
+            model = CnnDA(
+                n_classes=data.n_train_classes,
+                n_domains=len(train_settings),
+                dataset=config['dataset']
+            ).to(device)
     elif model_type == 'GNN':
         # Create graph data loaders and init GNN
         data.transform_to_graph_data(**model_config['graph'])

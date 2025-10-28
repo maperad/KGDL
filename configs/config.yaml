@@ -1,21 +1,21 @@
 verbose: True  # True, False
 experiment_name: test
-dataset: PHMAP23Spacecraftpropulsion  # CWRU, PHM22Rockdrill, PHMAP23Spacecraftpropulsion
+dataset: CWRU  # CWRU, PHM22Rockdrill, PHMAP23Spacecraftpropulsion
 seed: 1  # Random seed
 embedding_dim: 64  # Embedding dimension
 eval_interval: 1  # Model gets evaluated every eval_interval epochs
-cuda_device: 1  # Select cuda device
+cuda_device: 0  # Select cuda device
 
 loss:  # Set loss
   clf:
-    epochs: 200  # Epochs classification
-  embedding:  # Comment out if no embedding is wanted
-    epochs: 200  # Epochs embedding
-    name: kg  # kg, supcon
-    temperature: 0.1  # Temperature in contrastive loss
+    epochs: 2  # Epochs classification
+  # embedding:  # Comment out if no embedding is wanted
+  #   epochs: 200  # Epochs embedding
+  #   name: kg  # kg, supcon
+  #   temperature: 0.1  # Temperature in contrastive loss
 
 model:
-  type: GNN  # GNN, CNN
+  type: CNN_DA  # GNN, CNN, CNN_DA
   CNN:
     split_type: phase  # phase, one
   GNN:
@@ -24,13 +24,15 @@ model:
       edge_attr: True  # True, False
       bandwidth: 2  # Gaussian kernel bandwidth for edge attributes
     cnn_pre: True  # True, False
+  CNN_DA:
+    type: da  # da, mmd
 
 data:
   train_size: 0.8
   batch_size: 16
   force_reload: True  # True, False
   CWRU:
-    path_to_data: path/to/CWRU_data
+    path_to_data: /home/mpradtke/00_DATA/CWRU_Bearing_Diagnostic/Data
     train_settings: ['1']  # ['0', '1', '2', '3']
     kg_path: kgs/cwru_fault_hierarchy.ttl
     load:

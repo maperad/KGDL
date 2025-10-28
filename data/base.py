@@ -327,6 +327,15 @@ class DataPrep():
         train_data, test_data['train_setting'] = self._train_test_split_size(
             data_dict, test_size
         )
+        self.domain_label_map = {
+            str(c): i for i, c in enumerate(
+                set(train_data[self.setting_name].tolist())
+            )
+        }
+        train_data['y_domain'] = torch.tensor(
+            [self.domain_label_map[str(s.item())]
+             for s in train_data[self.setting_name]], dtype=torch.long
+        )
         dataloader_train = DataLoader(
             DictDataset(train_data), batch_size=batch_size, shuffle=True,
             num_workers=0, worker_init_fn=self._worker_init_fn
