@@ -59,14 +59,16 @@ class CnnDA(nn.Module):
         # Select the correct embedding network based on the dataset
         # TODO
         if dataset == 'CWRU':
-            self.conv, self.dom_clf, self.clf = cwru_architecture(
-                n_classes, n_domains
-            )
+            self.conv, self.dom_clf, self.emb_clf, self.clf = \
+                cwru_architecture(
+                    n_classes, n_domains
+                )
             self.domain = 'rpm'
         elif dataset == 'PHM22Rockdrill':
-            self.conv, self.dom_clf, self.clf = phm22_rockdrill_architecture()
+            self.conv, self.dom_clf, self.emb_clf, self.clf = \
+                phm22_rockdrill_architecture()
         elif dataset == 'PHMAP23Spacecraftpropulsion':
-            self.conv, self.dom_clf, self.clf = \
+            self.conv, self.dom_clf, self.emb_clf, self.clf = \
                 phmap23_spacecraftpropulsion_architecture()
         else:
             raise NotImplementedError(
@@ -77,7 +79,7 @@ class CnnDA(nn.Module):
             self, input, domain_adversarial: bool = False,
     ) -> torch.Tensor:
         features = self.conv(input)
-        out = {'clf_scores': self.clf(features)}
+        out = {'clf_scores': self.clf(self.emb_clf(features))}
         if domain_adversarial:
             grl_features = GradientReversalFunction.apply(features, 1.0)
             out['dom_scores'] = self.dom_clf(grl_features)
@@ -130,8 +132,10 @@ class CnnDA(nn.Module):
             return loss, acc
 
     def get_proj_emb_clf_y_from_dataloader(
-            self, data_loader, device, projection=True
+            self, data_loader, device, projection=False
     ):
+        # Needed for evaluation compatibility with other models
+        # projection is ignored in DA setting
         self.eval()
         with torch.no_grad():
             emb_X = []
@@ -139,22 +143,14 @@ class CnnDA(nn.Module):
             clf_X = []
             y = []
             for data in data_loader:
-                if isinstance(data, HeteroData):
-                    emb = self.embed(data.to(device))
-                if isinstance(data, dict):
-                    emb = self.embed(data['X'].to(device))
+                features = self.conv(data['X'].to(device))
+                emb = self.emb_clf(features)
                 emb_X.append(emb.to('cpu'))
-                if projection:
-                    proj = F.normalize(self.net_project(emb), p=2)
-                    proj_X.append(proj.to('cpu'))
-                clf = self.net_clf(emb)
+                clf = self.clf(emb)
                 clf_X.append(clf.to('cpu'))
                 y.append(data['y'].to('cpu'))
             emb_X = torch.cat(emb_X, dim=0).detach().numpy()
-            if projection:
-                proj_X = torch.cat(proj_X, dim=0).detach().numpy()
-            else:
-                proj_X = None
+            proj_X = None
             clf_X = torch.cat(clf_X, dim=0).detach().numpy()
             y = torch.cat(y, dim=0).detach().numpy()
         return proj_X, emb_X, clf_X, y
@@ -190,13 +186,14 @@ def cwru_architecture(n_classes, n_domains):
         nn.Linear(64, n_domains)
     )
 
-    clf = nn.Sequential(
+    emb_clf = nn.Sequential(
         nn.Linear(conv_out_dim, 64),
-        nn.LeakyReLU(0.5),
-        nn.Linear(64, n_classes)
+        nn.LeakyReLU(0.5)
     )
 
-    return conv, dom_clf, clf
+    clf = nn.Linear(64, n_classes)
+
+    return conv, dom_clf, emb_clf, clf
 
 
 def phm22_rockdrill_architecture():

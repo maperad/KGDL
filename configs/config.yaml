@@ -33,7 +33,7 @@ data:
   force_reload: True  # True, False
   CWRU:
     path_to_data: /home/mpradtke/00_DATA/CWRU_Bearing_Diagnostic/Data
-    train_settings: ['1']  # ['0', '1', '2', '3']
+    train_settings: ['1', '2']  # ['0', '1', '2', '3']
     kg_path: kgs/cwru_fault_hierarchy.ttl
     load:
       sample_rate: 12
