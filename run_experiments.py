@@ -10,7 +10,7 @@ from main import main
 
 
 def run_ablation_study(
-        dataset, exp_name, test=False, save_models=False
+        dataset, exp_name, test=False, save_models=False, cuda_device=0
 ):
 
     # Load config files #######################################################
@@ -20,6 +20,7 @@ def run_ablation_study(
 
     experiment_name = (f"{datetime.now().strftime('%Y-%m-%d')}_{exp_name}")
     config['experiment_name'] = experiment_name
+    config['cuda_device'] = cuda_device
 
     ###########################################################################
 
@@ -29,7 +30,7 @@ def run_ablation_study(
     random_seeds = [67,  87, 660,  71, 695, 950, 516, 685, 641, 320]
     if test:
         random_seeds = [1, 2]
-    model_types = ['CNN', 'GNN']
+    model_types = ['CNN_DA']  # ['CNN', 'GNN']
     config['data']['train_size'] = 0.8
 
     ###########################################################################
@@ -162,6 +163,10 @@ def run_ablation_study(
         (losses[0], 'phase'),  # CNN + CE
         (losses[2], 'phase'),  # CNN + SupCon
     ]
+    cnn_da_options = [
+        'da',  # Domain Adversarial training
+        # 'mmd'  # Maximium Mean Discrepancy loss
+    ]
 
     ###########################################################################
 
@@ -203,6 +208,20 @@ def run_ablation_study(
                 single_run_config['loss'] = loss
                 main(single_run_config, save_models)
 
+        elif model_type == 'CNN_DA':
+            cnn_da_bar = tqdm(
+                cnn_da_options, leave=False, desc="CNN_DA configurations"
+            )
+            for da_type in cnn_da_bar:
+                model_config['type'] = da_type
+                single_run_config = copy.deepcopy(config)
+                single_run_config['model'] = {
+                    'type': model_type,
+                    model_type: model_config
+                }
+                single_run_config['loss'] = losses[0]
+                main(single_run_config, save_models)
+
 
 if __name__ == '__main__':
 
@@ -213,7 +232,12 @@ if __name__ == '__main__':
     parser.add_argument('--exp_name', type=str, default='test')
     parser.add_argument('--test', action="store_true")
     parser.add_argument('--save_models', action="store_true")
+    parser.add_argument('--cuda_device', type=int, default=0)
     args = parser.parse_args()
     run_ablation_study(
-        args.dataset, args.exp_name, args.test, args.save_models
+        args.dataset,
+        args.exp_name,
+        args.test,
+        args.save_models,
+        args.cuda_device
     )

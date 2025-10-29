@@ -17,6 +17,8 @@ model:
       edge_attr: True
       bandwidth: Set in experiment script
     cnn_pre: Set in the experiment script
+  CNN_DA:
+    type: Set in the experiment script
 
 loss: Set in the experiment script
 
