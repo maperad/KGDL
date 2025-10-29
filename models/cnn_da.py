@@ -61,15 +61,17 @@ class CnnDA(nn.Module):
         if dataset == 'CWRU':
             self.conv, self.dom_clf, self.emb_clf, self.clf = \
                 cwru_architecture(
-                    n_classes, n_domains
+                    n_classes, n_domains, conv_out_dim=96, input_channels=1
                 )
             self.domain = 'rpm'
         elif dataset == 'PHM22Rockdrill':
             self.conv, self.dom_clf, self.emb_clf, self.clf = \
-                phm22_rockdrill_architecture()
+                phm22_rockdrill_architecture(n_classes, n_domains)
         elif dataset == 'PHMAP23Spacecraftpropulsion':
             self.conv, self.dom_clf, self.emb_clf, self.clf = \
-                phmap23_spacecraftpropulsion_architecture()
+                phmap23_spacecraftpropulsion_architecture(
+                    n_classes, n_domains, conv_out_dim=40, input_channels=7
+                )
         else:
             raise NotImplementedError(
                 f'Dataset {dataset} not implemented.'
@@ -156,10 +158,10 @@ class CnnDA(nn.Module):
         return proj_X, emb_X, clf_X, y
 
 
-def cwru_architecture(n_classes, n_domains):
+def cwru_architecture(n_classes, n_domains, conv_out_dim=96, input_channels=1):
     kernel = 12
     conv = nn.Sequential(
-        nn.Conv1d(1, 64, kernel),
+        nn.Conv1d(input_channels, 64, kernel),
         nn.LeakyReLU(0.5),
         nn.MaxPool1d(kernel_size=kernel, stride=2),
         nn.Dropout1d(p=0.1),
@@ -178,8 +180,6 @@ def cwru_architecture(n_classes, n_domains):
         nn.Flatten()
     )
 
-    conv_out_dim = 96  # Depends on input size
-
     dom_clf = nn.Sequential(
         nn.Linear(conv_out_dim, 64),
         nn.LeakyReLU(0.5),
@@ -196,9 +196,71 @@ def cwru_architecture(n_classes, n_domains):
     return conv, dom_clf, emb_clf, clf
 
 
-def phm22_rockdrill_architecture():
-    pass
+def phm22_rockdrill_architecture(n_classes, n_domains):
+    conv = nn.Sequential(
+        nn.Conv1d(
+            3, 16, kernel_size=15, stride=1,
+            padding=7,
+        ),
+        nn.BatchNorm1d(16),
+        nn.ReLU(),
+        nn.Conv1d(
+            16, 32, kernel_size=15, stride=1,
+            padding=7,
+        ),
+        nn.BatchNorm1d(32),
+        nn.ReLU(),
+        nn.MaxPool1d(kernel_size=2),
+        nn.Conv1d(
+            32, 64, kernel_size=7, stride=1, padding=3
+        ),
+        nn.BatchNorm1d(64),
+        nn.ReLU(),
+        nn.Conv1d(
+            64, 128, kernel_size=7, stride=1, padding=3,
+        ),
+        nn.BatchNorm1d(128),
+        nn.ReLU(),
+        nn.MaxPool1d(kernel_size=2),
+        nn.Conv1d(
+            128, 256, kernel_size=3, stride=1, padding=1,
+        ),
+        nn.Flatten(),
+        nn.Linear(57600, 512),
+        nn.ReLU()
+    )
+
+    dom_clf = nn.Sequential(
+        nn.Linear(512, 256),
+        nn.BatchNorm1d(256),
+        nn.ReLU(),
+        nn.Linear(256, 64),
+        nn.BatchNorm1d(64),
+        nn.ReLU(),
+        nn.Linear(64, n_domains)
+    )
+
+    emb_clf = nn.Sequential(
+        nn.Linear(512, 256),
+        nn.BatchNorm1d(256),
+        nn.ReLU(),
+        nn.Linear(256, 64),
+        nn.BatchNorm1d(64),
+        nn.ReLU()
+    )
+
+    clf = nn.Linear(64, n_classes)
+
+    return conv, dom_clf, emb_clf, clf
 
 
-def phmap23_spacecraftpropulsion_architecture():
-    pass
+def phmap23_spacecraftpropulsion_architecture(
+        n_classes,
+        n_domains,
+        conv_out_dim=40,
+        input_channels=7
+):
+    conv, dom_clf, emb_clf, clf = cwru_architecture(
+        n_classes, n_domains, conv_out_dim, input_channels
+    )
+    return conv, dom_clf, emb_clf, clf

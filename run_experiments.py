@@ -9,7 +9,7 @@ from tqdm import tqdm
 from main import main
 
 
-def run_ablation_study(
+def run_experiments(
         dataset, exp_name, test=False, save_models=False, cuda_device=0
 ):
 
@@ -21,6 +21,14 @@ def run_ablation_study(
     experiment_name = (f"{datetime.now().strftime('%Y-%m-%d')}_{exp_name}")
     config['experiment_name'] = experiment_name
     config['cuda_device'] = cuda_device
+
+    # TODO adjust for final push
+    config['data']['CWRU']['path_to_data'] = \
+        '/home/mpradtke/00_DATA/CWRU_Bearing_Diagnostic/Data'
+    config['data']['PHM22Rockdrill']['path_to_data'] = \
+        '/home/mpradtke/00_DATA/PHM22_RockDrill_Diagnostic'
+    config['data']['PHMAP23Spacecraftpropulsion']['path_to_data'] = \
+        '/home/mpradtke/00_DATA/PHMAP23_SpacecraftPropulsion_Diagnostic'
 
     ###########################################################################
 
@@ -234,7 +242,7 @@ if __name__ == '__main__':
     parser.add_argument('--save_models', action="store_true")
     parser.add_argument('--cuda_device', type=int, default=0)
     args = parser.parse_args()
-    run_ablation_study(
+    run_experiments(
         args.dataset,
         args.exp_name,
         args.test,

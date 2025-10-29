@@ -150,7 +150,6 @@ class EncCnnPHM22Rockdrill(torch.nn.Module):
             self.n_parts = 1
         elif split_type == 'phase':
             self.n_parts = 3
-        self.n_domains = 8
 
         self.conv = nn.ModuleDict({
             str(k): nn.Sequential(
