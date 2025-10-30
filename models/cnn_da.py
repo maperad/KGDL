@@ -183,15 +183,23 @@ def cwru_architecture(n_classes, n_domains, conv_out_dim=96, input_channels=1):
     dom_clf = nn.Sequential(
         nn.Linear(conv_out_dim, 64),
         nn.LeakyReLU(0.5),
-        nn.Linear(64, n_domains)
+        # Added for DA
+        nn.Linear(64, 32),
+        nn.LeakyReLU(0.5),
+        ################
+        nn.Linear(32, n_domains)  # 32 -> 64 changed for DA
     )
 
     emb_clf = nn.Sequential(
         nn.Linear(conv_out_dim, 64),
-        nn.LeakyReLU(0.5)
+        nn.LeakyReLU(0.5),
+        # Added for DA
+        nn.Linear(64, 32),
+        nn.LeakyReLU(0.5),
+        ################
     )
 
-    clf = nn.Linear(64, n_classes)
+    clf = nn.Linear(32, n_classes)  # 32 -> 64 changed for DA
 
     return conv, dom_clf, emb_clf, clf
 
