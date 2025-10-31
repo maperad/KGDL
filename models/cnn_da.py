@@ -1,3 +1,5 @@
+import itertools
+
 import torch
 import torch.nn as nn
 from torchsummary import summary
@@ -49,7 +51,7 @@ class CnnDA(nn.Module):
 
     def __init__(
             self, n_classes: int, n_domains: int = None, dataset: str = None,
-            da: False = True, mmd: bool = False
+            da: bool = False, mmd: bool = False
     ):
         super().__init__()
 
@@ -78,12 +80,16 @@ class CnnDA(nn.Module):
             )
 
     def forward(
-            self, input, domain_adversarial: bool = False,
+            self, input, domain_adversarial: bool = False, mmd: bool = False
     ) -> torch.Tensor:
+        out = {}
         features = self.conv(input)
-        out = {'clf_scores': self.clf(self.emb_clf(features))}
+        emb_clf_out = self.emb_clf(features)
+        out['clf_scores'] = self.clf(emb_clf_out)
+        if mmd:
+            out['mmd_features'] = emb_clf_out
         if domain_adversarial:
-            grl_features = GradientReversalFunction.apply(features, 1.0)
+            grl_features = GradientReversalFunction.apply(out['features'], 1.0)
             out['dom_scores'] = self.dom_clf(grl_features)
         return out
 
@@ -103,15 +109,27 @@ class CnnDA(nn.Module):
         for data in data_loader:
             data = {k: v.to(device) for k, v in data.items()}
             optimizer.zero_grad()
-            out = self(data['X'], self.da)
+            out = self(data['X'], self.da, self.mmd)
             loss = criterion(out['clf_scores'], data['y'])
             if self.da:
                 criterion_da = nn.CrossEntropyLoss()
                 loss += criterion_da(
                     out['dom_scores'], data['y_domain']
                 )
-            if self.mmd:
-                raise NotImplementedError("MMD not implemented yet.")
+            if self.mmd and (len(data['y_domain'].unique()) > 1):
+                loss_mmd = []
+                for d_i, d_j in itertools.combinations(
+                        data['y_domain'].unique(), 2
+                ):
+                    feat_i = out['mmd_features'][
+                        data['y_domain'] == d_i
+                    ]
+                    feat_j = out['mmd_features'][
+                        data['y_domain'] == d_j
+                    ]
+                    criterion_mmd = MMDLoss(bandwith=2.0)
+                    loss_mmd.append(criterion_mmd(feat_i, feat_j))
+                loss += sum(loss_mmd) / len(loss_mmd)
             loss.backward()
             optimizer.step()
 

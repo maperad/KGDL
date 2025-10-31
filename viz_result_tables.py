@@ -339,9 +339,9 @@ def create_latex_table(
 
 
 if __name__ == "__main__":
-    # ds = "PHMAP23Spacecraftpropulsion"
+    ds = "PHMAP23Spacecraftpropulsion"
     # exp_name = "2025-10-29_domain_adversarial_training"
-    ds = "CWRU"
+    # ds = "CWRU"
     exp_name = "2025-10-30_da_training_add_layer"
     # ds = "PHM22Rockdrill"
     # exp_name = "2025-03-04_christmas_extension_DQ_ST_V_with_christmas_extension_with_supcon"

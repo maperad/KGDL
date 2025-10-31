@@ -25,7 +25,8 @@ model:
       bandwidth: 2  # Gaussian kernel bandwidth for edge attributes
     cnn_pre: True  # True, False
   CNN_DA:
-    type: da  # da, mmd
+    da: False
+    mmd: True
 
 data:
   train_size: 0.8
@@ -33,7 +34,7 @@ data:
   force_reload: True  # True, False
   CWRU:
     path_to_data: /home/mpradtke/00_DATA/CWRU_Bearing_Diagnostic/Data
-    train_settings: ['1', '2']  # ['0', '1', '2', '3']
+    train_settings: ['1', '2', '3']  # ['0', '1', '2', '3']
     kg_path: kgs/cwru_fault_hierarchy.ttl
     load:
       sample_rate: 12

@@ -118,7 +118,9 @@ def main(config: dict, save_model: bool = False) -> None:
             model = CnnDA(
                 n_classes=data.n_train_classes,
                 n_domains=len(train_settings),
-                dataset=config['dataset']
+                dataset=config['dataset'],
+                da=model_config['da'],
+                mmd=model_config['mmd']
             ).to(device)
     elif model_type == 'GNN':
         # Create graph data loaders and init GNN

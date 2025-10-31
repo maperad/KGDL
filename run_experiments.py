@@ -172,8 +172,8 @@ def run_experiments(
         (losses[2], 'phase'),  # CNN + SupCon
     ]
     cnn_da_options = [
-        'da',  # Domain Adversarial training
-        # 'mmd'  # Maximium Mean Discrepancy loss
+        # (True, False),  # Domain Adversarial training
+        (False, True)  # Maximium Mean Discrepancy loss
     ]
 
     ###########################################################################
@@ -220,8 +220,9 @@ def run_experiments(
             cnn_da_bar = tqdm(
                 cnn_da_options, leave=False, desc="CNN_DA configurations"
             )
-            for da_type in cnn_da_bar:
-                model_config['type'] = da_type
+            for da, mmd in cnn_da_bar:
+                model_config['da'] = da
+                model_config['mmd'] = mmd
                 single_run_config = copy.deepcopy(config)
                 single_run_config['model'] = {
                     'type': model_type,
