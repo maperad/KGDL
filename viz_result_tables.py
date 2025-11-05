@@ -133,6 +133,8 @@ def create_latex_table(
         'model_GNN_graph_split_type',
         'model_CNN_split_type',
         'model_CNN_DA_type',
+        'model_CNN_DA_da',
+        'model_CNN_DA_mmd',
         'loss_embedding_losses_Emb-KG_params_name',
         'n_tr_settings',
         'ood'
@@ -264,9 +266,20 @@ def create_latex_table(
             return 'GnnPsApKg'
         if (
             (row['model_type'] == 'CNN_DA')
-            and (row['model_CNN_DA_type'] == 'da')
+            and (
+                (row['model_CNN_DA_type'] == 'da')
+                or (row['model_CNN_DA_da'] == 'True')
+                )
         ):
             return 'DA'
+        if (
+            (row['model_type'] == 'CNN_DA')
+            and (
+                (row['model_CNN_DA_type'] == 'mmd')
+                or (row['model_CNN_DA_mmd'] == 'True')
+                )
+        ):
+            return 'MMD'
 
     df_grouped['model_name'] = df_grouped.apply(get_model_name, axis=1)
     df_grouped_te = df_grouped[~df_grouped.ood]
@@ -339,17 +352,22 @@ def create_latex_table(
 
 
 if __name__ == "__main__":
-    ds = "PHMAP23Spacecraftpropulsion"
+    # ds = "PHMAP23Spacecraftpropulsion"
     # exp_name = "2025-10-29_domain_adversarial_training"
+    # exp_name = "2025-10-31_mmd_training_add_layer"
     # ds = "CWRU"
-    exp_name = "2025-10-30_da_training_add_layer"
-    # ds = "PHM22Rockdrill"
+    # exp_name = "2025-10-30_da_training_add_layer"
+    # exp_name = "2025-10-31_mmd_training_add_layer"
+    ds = "PHM22Rockdrill"
+    exp_name = "2025-10-29_domain_adversarial"
+    # exp_name = "2025-10-31_mmd_training"
     # exp_name = "2025-03-04_christmas_extension_DQ_ST_V_with_christmas_extension_with_supcon"
     if ds == 'PHM22Rockdrill':
         settings = [4, 5, 6]
     else:
         settings = [2, 3, 4]
     models = [
+        # "MMD",
         "DA",
         # "CnnCe",
         # "CnnSup",

@@ -65,44 +65,45 @@ def run_sensitivity_analysis(
     train_settings = {
         'CWRU': [], 'PHM22Rockdrill': [], 'PHMAP23Spacecraftpropulsion': []
     }
-    for i in [2, 3, 4]:
-        train_settings['CWRU'].extend(
-            list(itertools.combinations(['0', '1', '2', '3'], i))
-        )
-    for i in [2, 3, 4]:
-        # Ensure 4 is always in the train settings
-        train_settings['PHMAP23Spacecraftpropulsion'].extend(
-            [
-                comb for comb in itertools.combinations([1, 2, 3, 4], i)
-                if 4 in comb
-            ]
-        )
-    train_settings['PHM22Rockdrill'] = [
-        [0, 1, 2, 3], [4, 5, 6, 7],
-        [0, 1, 2, 3, 4], [3, 4, 5, 6, 7],
-        [0, 1, 2, 3, 4, 5], [2, 3, 4, 5, 6, 7]
-    ]
+    # for i in [2, 3, 4]:
+    #     train_settings['CWRU'].extend(
+    #         list(itertools.combinations(['0', '1', '2', '3'], i))
+    #     )
+    # for i in [2, 3, 4]:
+    #     # Ensure 4 is always in the train settings
+    #     train_settings['PHMAP23Spacecraftpropulsion'].extend(
+    #         [
+    #             comb for comb in itertools.combinations([1, 2, 3, 4], i)
+    #             if 4 in comb
+    #         ]
+    #     )
+    train_settings['PHMAP23Spacecraftpropulsion'] = [[2, 3, 4]]
+    # train_settings['PHM22Rockdrill'] = [
+    #     [0, 1, 2, 3], [4, 5, 6, 7],
+    #     [0, 1, 2, 3, 4], [3, 4, 5, 6, 7],
+    #     [0, 1, 2, 3, 4, 5], [2, 3, 4, 5, 6, 7]
+    # ]
 
     # Out of distribution (OOD) faults
     ood_fault_lists = {
         'CWRU': [
             [],
-            ['007IR', '014IR', '021IR'],
-            ['007OR', '014OR', '021OR'],
-            ['007B', '014B', '021B']
+            # ['007IR', '014IR', '021IR'],
+            # ['007OR', '014OR', '021OR'],
+            # ['007B', '014B', '021B']
         ],
         'PHM22Rockdrill': [
             [],
-            ['R', 'C'],
-            ['A', 'B', 'O'],
-            ['D', 'Q'],
-            ['V'],
-            ['S', 'T']
+            # ['R', 'C'],
+            # ['A', 'B', 'O'],
+            # ['D', 'Q'],
+            # ['V'],
+            # ['S', 'T']
         ],
         'PHMAP23Spacecraftpropulsion': [
             [],
-            ['BV1', 'BP1', 'BP2', 'BP3', 'BP4', 'BP5', 'BP6', 'BP7'],
-            ['SV1', 'SV2', 'SV3', 'SV4']
+            # ['BV1', 'BP1', 'BP2', 'BP3', 'BP4', 'BP5', 'BP6', 'BP7'],
+            # ['SV1', 'SV2', 'SV3', 'SV4']
         ]
     }
 
@@ -153,12 +154,15 @@ def run_sensitivity_analysis(
     ###########################################################################
 
     # Hyperparameters for sensitvity analysis #################################
-    temp_val_options = [0.01, 0.1, 1]
-    bandwidth_options = [0.5, 1.0, 2.0]
+    temp_val_options = [0.02, 0.04, 0.06, 0.08, 0.1, 0.12, 0.14]
+    bandwidth_options = [0.1, 0.2, 0.5, 1, 2, 5]
 
     hyperparameters = [
-        (temp, bandwidth)
+        (temp, 2)  # Default bandwidth 2
         for temp in temp_val_options
+    ]
+    hyperparameters += [
+        (0.1, bandwidth)  # Default temperature 0.1
         for bandwidth in bandwidth_options
     ]
 

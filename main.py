@@ -73,7 +73,10 @@ def main(config: dict, save_model: bool = False) -> None:
         and ('embedding' in config['loss'].keys())
     ):
         parts = ['embedding', 'clf']
-        criterion['embedding'] = EmbLoss(config['loss']['embedding']['name'])
+        criterion['embedding'] = EmbLoss(
+            name=config['loss']['embedding']['name'],
+            temperature=config['loss']['embedding']['temperature']
+        )
         # Create y embedding based on knowledge graph
         # Needed for all embedding losses for projection dimension
         data.get_kg_emb_target(Path(data_config['kg_path']))
