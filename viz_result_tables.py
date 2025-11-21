@@ -359,16 +359,16 @@ if __name__ == "__main__":
     # exp_name = "2025-10-30_da_training_add_layer"
     # exp_name = "2025-10-31_mmd_training_add_layer"
     ds = "PHM22Rockdrill"
-    exp_name = "2025-10-29_domain_adversarial"
-    # exp_name = "2025-10-31_mmd_training"
+    # exp_name = "2025-10-29_domain_adversarial"
+    exp_name = "2025-10-31_mmd_training"
     # exp_name = "2025-03-04_christmas_extension_DQ_ST_V_with_christmas_extension_with_supcon"
     if ds == 'PHM22Rockdrill':
         settings = [4, 5, 6]
     else:
         settings = [2, 3, 4]
     models = [
-        # "MMD",
-        "DA",
+        "MMD",
+        # "DA",
         # "CnnCe",
         # "CnnSup",
         # "CnnKg",

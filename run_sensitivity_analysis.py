@@ -13,6 +13,8 @@ def run_sensitivity_analysis(
         dataset, exp_name, test=False, save_models=False, cuda_device=0
 ):
 
+    # TODO adjust for final push
+
     # Load config files #######################################################
 
     with open('configs/config_experiments.yaml') as file:
@@ -35,7 +37,7 @@ def run_sensitivity_analysis(
     # General settings (Same for all datasets) ################################
 
     config['dataset'] = dataset
-    random_seeds = [67,  87, 660,  71, 695, 950, 516, 685, 641, 320]
+    random_seeds = [67,  87, 660,  72, 695, 950, 516, 685, 641, 320]
     if test:
         random_seeds = [1, 2]
     config['data']['train_size'] = 0.8
@@ -77,12 +79,11 @@ def run_sensitivity_analysis(
     #             if 4 in comb
     #         ]
     #     )
-    train_settings['PHMAP23Spacecraftpropulsion'] = [[2, 3, 4]]
-    # train_settings['PHM22Rockdrill'] = [
-    #     [0, 1, 2, 3], [4, 5, 6, 7],
+    train_settings['PHMAP23Spacecraftpropulsion'] = [[1, 3, 4]]
+    train_settings['PHM22Rockdrill'] = [[0, 1, 2, 3]]
+    #     [0, 1, 2, 3]  # , [4, 5, 6, 7],
     #     [0, 1, 2, 3, 4], [3, 4, 5, 6, 7],
     #     [0, 1, 2, 3, 4, 5], [2, 3, 4, 5, 6, 7]
-    # ]
 
     # Out of distribution (OOD) faults
     ood_fault_lists = {
@@ -93,16 +94,16 @@ def run_sensitivity_analysis(
             # ['007B', '014B', '021B']
         ],
         'PHM22Rockdrill': [
-            [],
+            # [],
             # ['R', 'C'],
-            # ['A', 'B', 'O'],
+            ['A', 'B', 'O'],
             # ['D', 'Q'],
             # ['V'],
             # ['S', 'T']
         ],
         'PHMAP23Spacecraftpropulsion': [
             [],
-            # ['BV1', 'BP1', 'BP2', 'BP3', 'BP4', 'BP5', 'BP6', 'BP7'],
+            ['BV1', 'BP1', 'BP2', 'BP3', 'BP4', 'BP5', 'BP6', 'BP7'],
             # ['SV1', 'SV2', 'SV3', 'SV4']
         ]
     }
@@ -154,8 +155,8 @@ def run_sensitivity_analysis(
     ###########################################################################
 
     # Hyperparameters for sensitvity analysis #################################
-    temp_val_options = [0.02, 0.04, 0.06, 0.08, 0.1, 0.12, 0.14]
-    bandwidth_options = [0.1, 0.2, 0.5, 1, 2, 5]
+    temp_val_options = [0.04, 0.06, 0.08, 0.1, 0.12, 0.14]
+    bandwidth_options = [0.1, 0.5, 1, 2, 3, 4, 5]
 
     hyperparameters = [
         (temp, 2)  # Default bandwidth 2

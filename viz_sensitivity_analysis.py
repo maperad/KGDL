@@ -27,10 +27,108 @@ def flatten_dict(
     return dict(items)
 
 
+def set_size(width, fraction=1):
+    """
+    https://jwalton.info/Embed-Publication-Matplotlib-Latex/
+    Set figure dimensions to avoid scaling in LaTeX.
+
+    Parameters
+    ----------
+    width: float
+            Document textwidth or columnwidth in pts
+    fraction: float, optional
+            Fraction of the width which you wish the figure to occupy
+
+    Returns
+    -------
+    fig_dim: tuple
+            Dimensions of figure in inches
+    """
+    # Width of figure (in pts)
+    fig_width_pt = width * fraction
+
+    # Convert from pt to inches
+    inches_per_pt = 1 / 72.27
+
+    # Golden ratio to set aesthetic figure height
+    # https://disq.us/p/2940ij3
+    golden_ratio = (5**.5 - 1) / 2
+
+    # Figure width in inches
+    fig_width_in = fig_width_pt * inches_per_pt
+    # Figure height in inches
+    fig_height_in = fig_width_in * golden_ratio
+
+    fig_dim = [fig_width_in, fig_height_in]
+
+    return fig_dim
+
+
+def set_plot_style(ds='CWRU'):
+    # Set plot style
+    plt.style.use('tableau-colorblind10')
+    text_width = 384
+    fig_dim = set_size(text_width)
+    # fig_dim[1] *= 1.3
+
+    colors = [
+        '#003a7d',
+        '#ff73b6',
+        '#4ecb8d',
+        '#ff9d3a',
+        '#008dff',
+        '#d83034',
+        '#c701ff',
+        '#f9e858',
+        '#595959',
+        '#d4d4d4'
+    ]
+    if ds == 'CWRU':
+        target_y_map_pub_map = {
+            '021IR': 'IR21',
+            '007IR': 'IR07',
+            '014IR': 'IR14',
+            '014OR': 'OR14',
+            '007OR': 'OR07',
+            '021OR': 'OR21',
+            '014B': 'B14',
+            '007B': 'B07',
+            '021B': 'B21',
+            'Normal': 'noFault'
+        }
+    else:
+        target_y_map_pub_map = {}
+
+    label_size = 10
+
+    tex_fonts = {
+        # Use LaTeX to write all text
+        "text.usetex": True,
+        "font.family": "serif",
+        # Use 10pt font in plots, to match 10pt font in document
+        "axes.labelsize": label_size,  # 8,
+        "font.size": label_size,  # 8,
+        # Make the legend/label fonts a little smaller
+        "legend.fontsize": label_size-2,  # 6,
+        "xtick.labelsize": label_size-2,  # 6,
+        "ytick.labelsize": label_size-2,  # 6
+    }
+    # Latex needs to be installed on the system
+    plt.rcParams.update(tex_fonts)
+    return fig_dim, colors, target_y_map_pub_map
+
+fig_dim, colors, _ = set_plot_style()
+
 # %%
 dataset = "PHMAP23Spacecraftpropulsion"
-experiment_name = "2025-10-14_sensitivity_temperature_bandwidth"
+# experiment_name = "2025-11-05_sens_analysis_234_noood"
+# experiment_name = "2025-11-11_sens_analysis_234"
+experiment_name = "2025-11-11_sens_analysis_134"
+train_settings = '[2, 3, 4]'
 
+# dataset = 'PHM22Rockdrill'
+# experiment_name = '2025-11-05_sens_analysis_0123_noood'
+# train_settings = '[0, 1, 2, 3]'
 # %%
 experiment_path = Path(
     "/home/mpradtke/01_DEV/PhaseGraph_KGLoss/experiments/"
@@ -116,27 +214,138 @@ df_out['ood'] = df_out[ood_col].apply(
 )
 
 # %%
-ood_faults = '[]'
-ood_col = f"data_{dataset}_load_ood_faults"
-train_settings = '(3, 4)'
-tr_set_col = f"data_{dataset}_train_settings"
-df_plot = df_out.loc[
-    (df_out[ood_col] == ood_faults)
-    & (df_out[tr_set_col] == train_settings)
-]
+# ood_faults = '[]'
+# ood_col = f"data_{dataset}_load_ood_faults"
+# tr_set_col = f"data_{dataset}_train_settings"
+# df_plot = df_out.loc[
+#     (df_out[ood_col] == ood_faults)
+#     & (df_out[tr_set_col] == train_settings)
+# ]
 # %%
+df_plot = df_out
 bw_col = 'model_GNN_graph_bandwidth'
 df_plot[bw_col] = df_plot[bw_col].astype(float)
 temp_col = 'loss_embedding_temperature'
 df_plot[temp_col] = df_plot[temp_col].astype(float)
 
+# %%
+df_plot = df_plot.loc[df_plot['seed'] != '71',]
+df_plot = df_plot.loc[df_plot[temp_col] != 0.02,]
+df_plot = df_plot.loc[df_plot[bw_col] != 0.2,]
 
 # %%
-df_bw = df_plot.loc[df_plot[temp_col] == 0.1, ]
-df_bw_mean = df_bw[[bw_col, 'clf_test_setting_acc']].groupby(bw_col).mean().reset_index()
-df_bw_std = df_bw[[bw_col, 'clf_test_setting_acc']].groupby(bw_col).std().reset_index()
+# Test accuarcy without OOD faults
+bw_mean = df_plot.loc[
+        (df_plot[temp_col] == 0.1) & (~df_plot['ood']),
+        [bw_col, 'clf_test_setting_acc']
+    ].groupby(bw_col).mean().reset_index()
+bw = bw_mean[bw_col].values
+bw_mean_vals = bw_mean['clf_test_setting_acc'].values
+bw_std = df_plot.loc[
+    (df_plot[temp_col] == 0.1) & (~df_plot['ood']),
+    [bw_col, 'clf_test_setting_acc']
+    ].groupby(bw_col).std().reset_index()['clf_test_setting_acc'].values
+temp_mean = df_plot.loc[
+    (df_plot[bw_col] == 2) & (~df_plot['ood']),
+    [temp_col, 'clf_test_setting_acc']
+].groupby(temp_col).mean().reset_index()
+temp = temp_mean[temp_col].values
+temp_mean_vals = temp_mean['clf_test_setting_acc'].values
+temp_std = df_plot.loc[
+    (df_plot[bw_col] == 2) & (~df_plot['ood']),
+    [temp_col, 'clf_test_setting_acc']
+].groupby(temp_col).std().reset_index()['clf_test_setting_acc'].values
+
 # %%
-df_tmp = df_plot.loc[df_plot[bw_col] == 1, ]
-df_tmp_mean = df_tmp[[temp_col, 'clf_test_setting_acc']].groupby(temp_col).mean().reset_index()
-df_tmp_std = df_tmp[[temp_col, 'clf_test_setting_acc']].groupby(temp_col).std().reset_index()
+# OOD detection
+bw_mean_ood = df_plot.loc[
+        (df_plot[temp_col] == 0.1) & (df_plot['ood']),
+        [bw_col, 'ood_train_setting_acc']
+    ].groupby(bw_col).mean().reset_index()
+bw_ood = bw_mean_ood[bw_col].values
+bw_mean_ood_vals = bw_mean_ood['ood_train_setting_acc'].values
+bw_std_ood = df_plot.loc[
+    (df_plot[temp_col] == 0.1) & (df_plot['ood']),
+    [bw_col, 'ood_train_setting_acc']
+    ].groupby(bw_col).std().reset_index()['ood_train_setting_acc'].values
+temp_mean_ood = df_plot.loc[
+    (df_plot[bw_col] == 2) & (df_plot['ood']),
+    [temp_col, 'ood_train_setting_acc']
+].groupby(temp_col).mean().reset_index()
+temp_ood = temp_mean_ood[temp_col].values
+temp_mean_ood_vals = temp_mean_ood['ood_train_setting_acc'].values
+temp_std_ood = df_plot.loc[
+    (df_plot[bw_col] == 2) & (df_plot['ood']),
+    [temp_col, 'ood_train_setting_acc']
+].groupby(temp_col).std().reset_index()['ood_train_setting_acc'].values
+
 # %%
+# Gaussian bandwidth plot
+fig, (ax1, ax2) = plt.subplots(figsize=(fig_dim[0], fig_dim[1]*0.8), ncols=2)
+
+ax1.plot(
+    bw, bw_mean_vals, marker='o',
+    color=colors[0], label=r'acc$_T$'
+)
+ax1.fill_between(bw, bw_mean_vals - bw_std, bw_mean_vals + bw_std, alpha=0.2)
+ax1.legend()
+ax1.set_ylim([0.7, 1.0])
+ax1.set_xticks(bw)
+ax1.grid()
+ax1.set_title('Domain Generalization')
+
+ax2.plot(
+    bw_ood, bw_mean_ood_vals, marker='o',
+    color=colors[1], label=r'acc$_{OOD}$'
+)
+ax2.fill_between(
+    bw_ood, bw_mean_ood_vals - bw_std_ood, bw_mean_ood_vals + bw_std_ood,
+    alpha=0.2
+)
+ax2.legend()
+ax2.set_ylim([0.7, 1.0])
+ax2.set_xticks(bw_ood)
+ax2.grid()
+ax2.set_title('Novel Fault Detection')
+ax2.set_yticklabels([])
+
+fig.supxlabel(r'Gaussian Kernel Bandwidth $\zeta$', y=-0.05)
+fig.supylabel('Accuracy')
+fig.savefig("fig_sensitivity_analysis_bandwidth.pdf", bbox_inches='tight')
+
+# Temperature plot
+fig, (ax1, ax2) = plt.subplots(figsize=(fig_dim[0], fig_dim[1]*0.8), ncols=2)
+
+ax1.plot(
+    temp, temp_mean_vals, marker='o',
+    color=colors[0], label=r'acc$_T$'
+)
+ax1.fill_between(
+    temp, temp_mean_vals - temp_std, temp_mean_vals + temp_std, alpha=0.2
+)
+ax1.legend()
+ax1.set_ylim([0.7, 1.0])
+ax1.set_xticks(temp)
+ax1.grid()
+ax1.set_title('Domain Generalization')
+
+ax2.plot(
+    temp_ood, temp_mean_ood_vals, marker='o',
+    color=colors[1], label=r'acc$_{OOD}$'
+)
+ax2.fill_between(
+    temp_ood,
+    temp_mean_ood_vals - temp_std_ood,
+    temp_mean_ood_vals + temp_std_ood,
+    alpha=0.2
+)
+ax2.legend()
+ax2.set_ylim([0.7, 1.0])
+ax2.set_xticks(temp_ood)
+ax2.grid()
+ax2.set_title('Novel Fault Detection')
+ax2.set_yticklabels([])
+
+fig.supxlabel(r'Temperature $\tau$', y=-0.05)
+fig.supylabel('Accuracy')
+fig.savefig("fig_sensitivity_analysis_temperature.pdf", bbox_inches='tight')
