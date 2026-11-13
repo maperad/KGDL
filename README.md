@@ -1,6 +1,8 @@
 # RDF-based Knowledge Graph Integration with Deep Learning for Fault Diagnosis
 
-This repository belongs to the paper *RDF-based Knowledge Graph Integration with Deep Learning for Fault Diagnosis*, which is currently under review. Abstract:
+This repository belongs to the paper *RDF-based Knowledge Graph Integration with Deep Learning for Fault Diagnosis*, which is available here: https://www.sciencedirect.com/science/article/pii/S147403462600114X
+
+Abstract:
 
 > Combining system knowledge with deep learning for fault diagnosis offers the potential to reduce the dependency of deep learning algorithms on extensive labeled datasets.
 However, existing methods often rely on highly specialized, problem-specific knowledge or demand detailed physical insights into the system, which limits their generalizability.
